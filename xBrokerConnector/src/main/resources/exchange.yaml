@@ -1,0 +1,16 @@
+
+- exchangeId: kraken1
+  name: Test Kraken1 Exchange
+  markets:
+    - marketId: BTCEUR
+      name: BTC/EUR
+      listeningTrades: true
+      listeningOrderBook: false
+
+- exchangeId: Bitstamp
+  name: Test Bitstamp Exchange
+  markets:
+    - marketId: ETHEUR
+      name: ETH/EUR
+      listeningTrades: true
+      listeningOrderBook: false
