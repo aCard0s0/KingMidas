@@ -1,5 +1,5 @@
 # 1st Stage - Build
-FROM maven:3.6-openjdk-11 AS bluider
+FROM maven:3.6-openjdk-11 AS builder
 COPY src /app/src
 COPY pom.xml /app
 WORKDIR /app
