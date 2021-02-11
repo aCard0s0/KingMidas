@@ -2,62 +2,68 @@ package dev.midas.xbc.stream;
 
 import dev.midas.xbc.config.ConfigManager;
 import dev.midas.xbc.config.domain.ExchangeConfig;
+import dev.midas.xbc.converters.ExchangeConverter;
+import dev.midas.xbc.stream.managers.ExchangeManager;
+import dev.midas.xbc.stream.managers.StreamManager;
+import dev.midas.xbc.stream.wrappers.Exchange;
 import info.bitrich.xchangestream.core.StreamingExchange;
-import info.bitrich.xchangestream.kraken.KrakenStreamingExchange;
-import io.reactivex.disposables.Disposable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.knowm.xchange.currency.CurrencyPair;
-import org.knowm.xchange.utils.jackson.CurrencyPairDeserializer;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.List;
 
 
 @Component
 public class ListeningEngine {
 
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LogManager.getLogger(StreamManager.class.getName());
 
     private ConfigManager configurator;
-    private DisposableFactory subscriptionFactory;
+    private ExchangeManager brokers;
+    private ExchangeConverter converter;
+    private StreamManager streams;
 
-    public ListeningEngine(ConfigManager configurator, DisposableFactory subscriptionFacotry) {
+    public ListeningEngine(ConfigManager configurator,
+                           ExchangeConverter converter,
+                           ExchangeManager brokers,
+                           StreamManager streams) {
         this.configurator = configurator;
-        this.subscriptionFactory = subscriptionFacotry;
+        this.converter = converter;
+        this.brokers = brokers;
+        this.streams = streams;
     }
 
     public void startDefaultListeners() {
-        ExchangeConfig[] localConfig = configurator.loadExchangeConfig();
+        List<ExchangeConfig> localConfig = configurator.loadDefaultExchangeConfig();
 
-        Arrays.stream(localConfig).forEach(exchange -> {
-            // TODO: create class deserializer
-            StreamingExchange stream = subscriptionFactory.subscribeExchange(KrakenStreamingExchange.class);
-
-            exchange.getMarkets().stream().forEach(market -> {
-                subscriptionFactory.subscribeMarket(
-                        stream,
-                        CurrencyPairDeserializer.getCurrencyPairFromString(market.getMarketId()));
-            });
-        });
+        for (ExchangeConfig exchangeConfig : localConfig) {
+            startListener(exchangeConfig);
+        }
+        LOG.info(() -> "Default configuration started.");
     }
 
-    public void startListener(Class xStreamingExchange, CurrencyPair pair) {
-        StreamingExchange stream = subscriptionFactory.getStreamFromClass(xStreamingExchange);
+    public void startListener(ExchangeConfig config) {
+        this.startListener(converter.convert(config));
+    }
 
-        subscriptionFactory.subscribeMarket(stream, pair);
+    public void startListener(Exchange exchange) {
+        StreamingExchange stream = brokers.connectExchange(exchange);
+        streams.subscribeMarkets(stream, exchange.getMarkets());
+    }
+
+    public void stopListener(ExchangeConfig config) {
+        this.stopListener(converter.convert(config));
+    }
+
+    public void stopListener(Exchange exchange) {
+        StreamingExchange stream = brokers.disconnectExchange(exchange);
+        streams.unsubscribeMarkets(stream, exchange.getMarkets());
     }
 
     public void stopAllListeners() {
-        subscriptionFactory.unsubscribeAll();
+        brokers.disconnectAll();
+        streams.unsubscribeAll();
     }
-
-    public void stopListener(Class xStremingExchange, CurrencyPair pair) {
-        StreamingExchange stream = subscriptionFactory.getStreamFromClass(xStremingExchange);
-        Disposable subscription = subscriptionFactory.getDisposableFromPair(stream, pair);
-
-        subscriptionFactory.unsubscribeMarket(stream, subscription);
-    }
-
 }

@@ -1,15 +1,15 @@
-- exchangeId: Kraken
-  name: Test Kraken1 Exchange
+- exchangeId: kraken
+  name: Test Kraken Exchange
   markets:
-    - pair: BTCEUR
+    - marketId: BTCEUR
+      name: BTC/EUR
       listeningTrades: true
-      listeningTicker: true
       listeningOrderBook: false
 
-- exchangeId: Bitstamp
+- exchangeId: bitstamp
   name: Test Bitstamp Exchange
   markets:
-    - pair: ETHEUR
+    - marketId: ETHEUR
+      name: ETH/USD
       listeningTrades: true
-      listeningTicker: true
       listeningOrderBook: false

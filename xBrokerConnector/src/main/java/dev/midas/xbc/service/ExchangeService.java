@@ -25,12 +25,17 @@ public class ExchangeService {
 
     public void startListener(String exchangeId, String marketId) {
         // Deserilaztion
-        this.engine.startListener(KrakenStreamingExchange.class, CurrencyPair.BTC_EUR);
+        //this.engine.startListener(KrakenStreamingExchange.class, CurrencyPair.BTC_EUR);
     }
 
     public void stopListener(String exchangeId, String marketId) {
         // Deserilaztion
-        this.engine.stopListener(KrakenStreamingExchange.class, CurrencyPair.BTC_EUR);
+        //this.engine.stopListener(KrakenStreamingExchange.class, CurrencyPair.BTC_EUR);
+    }
+
+    public void stopListener(String exchangeId) {
+        // Deserilaztion
+        //this.engine.stopListener(KrakenStreamingExchange.class);
     }
 
     public static void testGetCurrentPrice() {

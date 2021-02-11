@@ -7,27 +7,25 @@ import com.google.common.base.Objects;
 public class MarketConfig {
 
     public static class Builder {
-        private String marketId;
-        private String name;
+        private String pair;
         private boolean isListeningTrades;
+        private boolean isListeningTicker;
         private boolean isListeningOrderBook;
 
-        public Builder(String marketId) {
-            this.marketId = marketId;
-        }
+        public Builder() { }
 
-        public Builder setMarketId(String marketId) {
-            this.marketId = marketId;
-            return this;
-        }
-
-        public Builder setName(String name) {
-            this.name = name;
+        public Builder setPair(String pair) {
+            this.pair = pair;
             return this;
         }
 
         public Builder setListeningTrades(boolean listeningTrades) {
             this.isListeningTrades = listeningTrades;
+            return this;
+        }
+
+        public Builder setListeningTicker(boolean listeningTicker) {
+            this.isListeningTicker = listeningTicker;
             return this;
         }
 
@@ -37,39 +35,28 @@ public class MarketConfig {
         }
 
         public MarketConfig build() {
-            MarketConfig config = new MarketConfig(this.marketId);
-            config.name = this.name;
+            MarketConfig config = new MarketConfig();
+            config.pair = this.pair;
             config.isListeningTrades = this.isListeningTrades;
+            config.isListeningTicker = this.isListeningTicker;
             config.isListeningOrderBook = this.isListeningOrderBook;
             return config;
         }
     }
 
-    private String marketId;
-    private String name;
+    private String pair;
     private boolean isListeningTrades;
+    private boolean isListeningTicker;
     private boolean isListeningOrderBook;
 
     public MarketConfig() {}
 
-    private MarketConfig(String marketId) {
-        this.marketId = marketId;
+    public String getPair() {
+        return pair;
     }
 
-    public String getMarketId() {
-        return marketId;
-    }
-
-    public void setMarketId(String marketId) {
-        this.marketId = marketId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setPair(String pair) {
+        this.pair = pair;
     }
 
     public boolean isListeningTrades() {
@@ -78,6 +65,14 @@ public class MarketConfig {
 
     public void setListeningTrades(boolean listeningTrades) {
         isListeningTrades = listeningTrades;
+    }
+
+    public boolean isListeningTicker() {
+        return isListeningTicker;
+    }
+
+    public void setListeningTicker(boolean listeningTicker) {
+        this.isListeningTicker = listeningTicker;
     }
 
     public boolean isListeningOrderBook() {
@@ -99,23 +94,23 @@ public class MarketConfig {
 
         MarketConfig that = (MarketConfig) o;
 
-        return Objects.equal(marketId, that.marketId) &&
-                Objects.equal(name, that.name) &&
+        return Objects.equal(pair, that.pair) &&
                 Objects.equal(isListeningTrades, that.isListeningTrades) &&
+                Objects.equal(isListeningTicker, that.isListeningTicker) &&
                 Objects.equal(isListeningOrderBook, that.isListeningOrderBook);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(marketId, name, isListeningTrades, isListeningOrderBook);
+        return Objects.hashCode(pair, isListeningTrades, isListeningTicker, isListeningOrderBook);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("marketId", marketId)
-                .add("name", name)
+                .add("pair", pair)
                 .add("isListeningTrades", isListeningTrades)
+                .add("isListeningTicker", isListeningTicker)
                 .add("isListeningOrderBook", isListeningOrderBook)
                 .toString();
     }

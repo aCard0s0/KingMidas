@@ -10,6 +10,10 @@
   name: Test Bitstamp Exchange
   markets:
     - pair: ETHEUR
+      listeningTrades: false
+      listeningTicker: false
+      listeningOrderBook: false
+    - pair: LTCEUR
       listeningTrades: true
       listeningTicker: true
-      listeningOrderBook: false
+      listeningOrderBook: true

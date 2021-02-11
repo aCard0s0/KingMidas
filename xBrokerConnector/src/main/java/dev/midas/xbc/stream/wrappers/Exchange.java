@@ -1,59 +1,58 @@
-package dev.midas.xbc.config.domain;
+package dev.midas.xbc.stream.wrappers;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import dev.midas.xbc.config.domain.MarketConfig;
 
 import java.util.List;
 
-public class ExchangeConfig {
+public class Exchange {
 
     public static class Builder {
-        private String exchangeId;
+        private ExchangeMapper exchangeId;
         private String name;
         private List<MarketConfig> markets;
 
-        public Builder() { }
+        public Builder() {
+        }
 
-        public Builder setExchangeId(String exchangeId) {
+        public Exchange.Builder setExchangeId(ExchangeMapper exchangeId) {
             this.exchangeId = exchangeId;
             return this;
         }
 
-        public Builder setName(String name) {
+        public Exchange.Builder setName(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder setMarkets(List<MarketConfig> markets) {
+        public Exchange.Builder setMarkets(List<MarketConfig> markets) {
             this.markets = markets;
             return this;
         }
 
-        public ExchangeConfig build() {
-            ExchangeConfig config = new ExchangeConfig();
-            config.exchangeId = this.exchangeId;
-            config.name = this.name;
-            config.markets = this.markets;
-            return config;
+        public Exchange build() {
+            Exchange exchange = new Exchange();
+            exchange.exchangeMap = this.exchangeId;
+            exchange.name = this.name;
+            exchange.markets = this.markets;
+            return exchange;
         }
     }
 
-    private String exchangeId;
+    private ExchangeMapper exchangeMap;
     private String name;
     private List<MarketConfig> markets;
 
-    private ExchangeConfig() {}
-
-    private ExchangeConfig(String exchangeId) {
-        this.exchangeId = exchangeId;
+    private Exchange() {
     }
 
-    public String getExchangeId() {
-        return exchangeId;
+    public ExchangeMapper getExchangeMap() {
+        return exchangeMap;
     }
 
-    public void setExchangeId(String exchangeId) {
-        this.exchangeId = exchangeId;
+    public void setExchangeMap(ExchangeMapper exchangeMap) {
+        this.exchangeMap = exchangeMap;
     }
 
     public String getName() {
@@ -81,22 +80,22 @@ public class ExchangeConfig {
             return false;
         }
 
-        ExchangeConfig that = (ExchangeConfig) o;
+        Exchange that = (Exchange) o;
 
-        return Objects.equal(exchangeId, that.exchangeId) &&
+        return Objects.equal(exchangeMap, that.exchangeMap) &&
                 Objects.equal(name, that.name) &&
                 Objects.equal(markets, that.markets);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(exchangeId, name, markets);
+        return Objects.hashCode(exchangeMap, name, markets);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("exchangeId", exchangeId)
+                .add("exchangeId", exchangeMap)
                 .add("name", name)
                 .add("markets", markets)
                 .toString();
