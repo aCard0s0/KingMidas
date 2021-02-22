@@ -1,119 +1,104 @@
 package dev.midas.xbc.stream.managers;
 
+import com.google.common.collect.Lists;
 import dev.midas.xbc.config.domain.MarketConfig;
 import dev.midas.xbc.converters.MarketConverter;
-import dev.midas.xbc.stream.wrappers.Exchange;
+import dev.midas.xbc.pubsub.Publisher;
+import dev.midas.xbc.stream.managers.observers.OrderBookObserver;
+import dev.midas.xbc.stream.managers.observers.TickerObserver;
+import dev.midas.xbc.stream.managers.observers.TradeObserver;
 import dev.midas.xbc.stream.wrappers.Market;
 import info.bitrich.xchangestream.core.StreamingExchange;
-import info.bitrich.xchangestream.core.StreamingMarketDataService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.NotFoundException;
 import java.util.*;
 
 /**
- * This factory currently creates and destroys markets streams.
+ *  This manager ensures that only exist one unique Market in each Exchange House.
  */
 @Component
-public class StreamManager extends HashMap<StreamingExchange, List<Market>>{
+public class StreamManager extends HashMap<StreamingExchange, List<Market>> {
 
     private static final Logger LOG = LogManager.getLogger(StreamManager.class.getName());
 
-    private MarketConverter converter;
+    private final MarketConverter converter;
+    private final Publisher publisher;
 
     public StreamManager() {
         this.converter = new MarketConverter();
+        this.publisher = new Publisher();   // Hot fix
     }
 
-    public void subscribeMarket(StreamingExchange stream, MarketConfig config) {
-        if (!this.containsKey(stream)) {
-            this.put(stream, Collections.emptyList());
-        }
+    public void subscribeMarket(StreamingExchange stream, List<MarketConfig> configs) {
+        for (MarketConfig config : configs) this.subscribeMarket(stream, config);
+    }
 
-        StreamingMarketDataService streamService = stream.getStreamingMarketDataService();
+    public Market subscribeMarket(StreamingExchange stream, MarketConfig config) {
+        if (!this.containsKey(stream)) {
+            this.put(stream, Lists.newArrayList());
+        }
 
         Market market = converter.convert(config);
+        assert market != null;  // what a hell?
 
         if (config.isListeningTrades()) {
-            streamService.getTrades(market.getPair())
-                    .subscribe(trade -> {
-                                LOG.info("Trade: {}", trade);
-                                // next-step: publish to rabbitMQ
-                            },
-                            throwable -> LOG.info("Error in trade subscription", throwable));
+            market.setTradeListener(
+                stream.getStreamingMarketDataService().getTrades(market.getPair()).subscribeWith(new TradeObserver(publisher))
+            );
         }
         if (config.isListeningTicker()) {
-            streamService.getTicker(market.getPair())
-                    .subscribe();
+            market.setTradeListener(
+                stream.getStreamingMarketDataService().getTicker(market.getPair()).subscribeWith(new TickerObserver())
+            );
         }
         if (config.isListeningOrderBook()) {
-            streamService.getOrderBook(market.getPair())
-                    .subscribe();
+            market.setTradeListener(
+                stream.getStreamingMarketDataService().getOrderBook(market.getPair()).subscribeWith(new OrderBookObserver())
+            );
         }
+
+        this.get(stream).add(market);
+        LOG.debug(String.format("Market %s subscribed in Exchange %s", market.getPair(), stream.getExchangeSpecification().getExchangeName()));
+        return market;
     }
 
-    public void subscribeMarkets(StreamingExchange stream, List<MarketConfig> marketConfigs) {
+    public void unsubscribeMarket(StreamingExchange stream, List<MarketConfig> configs) {
+        for (MarketConfig config : configs) this.unsubscribeMarket(stream, config);
+    }
+
+    public void unsubscribeMarket(StreamingExchange stream, MarketConfig config) {
+        Market market = converter.convert(config);
+        assert market != null;  // what a hell?
+
+        this.unsubscribeMarket(stream, market.getPair());
+    }
+
+    public void unsubscribeMarket(StreamingExchange stream, CurrencyPair pair) {
         if (!this.containsKey(stream)) {
-            this.put(stream, Collections.emptyList());
+            throw new NotFoundException(String.format("Exchange %s not found", stream.getExchangeSpecification().getExchangeName()));
         }
 
-        StreamingMarketDataService streamService = stream.getStreamingMarketDataService();
+        List<Market> markets = this.get(stream);
+        Optional<Market> market = markets.stream().filter(m -> Objects.equals(m.getPair(), pair)).findFirst();
 
-        Market market;  // converter logic?
-        for(MarketConfig config: marketConfigs) {
-            market = converter.convert(config);
+        if(market.isPresent()) {
+            market.get().disposeAll();
+            markets.remove(market.get());
+            LOG.debug(String.format("Market %s unsubscribed in Exchange %s", pair, stream.getExchangeSpecification().getExchangeName()));
 
-            if (config.isListeningTrades()) {
-                streamService.getTrades(market.getPair())
-                        .subscribe(trade -> {
-                                    LOG.info("Trade: {}", trade);
-                                    // next-step: publish to rabbitMQ
-                                },
-                                throwable -> LOG.info("Error in trade subscription", throwable));
-            }
-            if (config.isListeningTicker()) {
-                streamService.getTicker(market.getPair())
-                        .subscribe();
-            }
-            if (config.isListeningOrderBook()) {
-                streamService.getOrderBook(market.getPair())
-                        .subscribe();
-            }
-        }
-
-        // List<Market> markets = exchange.getMarkets().stream().map(converter::convert).collect(Collectors.toList());
-        // merge values
-
-    }
-
-    public void unsubscribeMarkets(StreamingExchange stream, List<MarketConfig> marketConfigs) {
-        
-    }
-    
-    public void unsubscribePair(StreamingExchange stream, CurrencyPair pair) {
-
-        if (!containsKey(stream)) {
-            Optional<Market> market = get(stream).stream().filter(m -> Objects.equals(m.getPair(), pair)).findFirst();
-
-            if(market.isPresent()) {
-                market.get().getTradeListener().dispose();
-                //market.get().getTickerListener().dispose();
-                market.get().getOrderBookListener().dispose();
-                // subtract two lists
-                this.get(stream).remove(market);
-                LOG.debug(String.format("Exchange %s unsubscribe market %s", stream.getExchangeSpecification().getExchangeName(), pair));
-            }
         } else {
-            LOG.info(String.format("Exchange %s not subscribed", stream.getExchangeSpecification().getExchangeName()));
+            throw new NotFoundException(String.format("Market %s not found in Exchange %s", pair, stream.getExchangeSpecification().getExchangeName()));
         }
-    }
-
-    public List<Market> getMarketsForPair(CurrencyPair pair) {
-        return new ArrayList<>();
     }
 
     public void unsubscribeAll() {
+        for (List<Market> markets : this.values()) {
+            markets.forEach(Market::disposeAll);
+        }
     }
+
 }

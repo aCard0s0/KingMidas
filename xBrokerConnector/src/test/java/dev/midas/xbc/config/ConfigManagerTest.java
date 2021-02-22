@@ -30,15 +30,15 @@ public class ConfigManagerTest {
 
         assertEquals(exchangeConfigs.size(), 2);
         assertEquals(exchangeConfigs.get(0).getExchangeId(), "kraken");
-        assertEquals(exchangeConfigs.get(0).getName(), "Test Kraken Exchange");
+        assertEquals(exchangeConfigs.get(0).getName(), "TradeObserver Kraken Exchange");
         assertEquals(exchangeConfigs.get(0).getMarkets().size(), 1);
         assertEquals(exchangeConfigs.get(0).getMarkets().get(0).getPair(), "BTCEUR");
         assertTrue(exchangeConfigs.get(0).getMarkets().get(0).isListeningTrades());
         assertTrue(exchangeConfigs.get(0).getMarkets().get(0).isListeningTicker());
-        assertFalse(exchangeConfigs.get(0).getMarkets().get(0).isListeningOrderBook());
+        assertTrue(exchangeConfigs.get(0).getMarkets().get(0).isListeningOrderBook());
 
         assertEquals(exchangeConfigs.get(1).getExchangeId(), "bitstamp");
-        assertEquals(exchangeConfigs.get(1).getName(), "Test Bitstamp Exchange");
+        assertEquals(exchangeConfigs.get(1).getName(), "TradeObserver Bitstamp Exchange");
         assertEquals(exchangeConfigs.get(1).getMarkets().size(), 2);
         assertEquals(exchangeConfigs.get(1).getMarkets().get(0).getPair(), "ETHEUR");
         assertTrue(exchangeConfigs.get(1).getMarkets().get(0).isListeningTrades());

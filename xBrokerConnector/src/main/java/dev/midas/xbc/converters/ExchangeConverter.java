@@ -4,7 +4,9 @@ import com.google.common.base.Converter;
 import dev.midas.xbc.config.domain.ExchangeConfig;
 import dev.midas.xbc.stream.wrappers.Exchange;
 import dev.midas.xbc.stream.wrappers.ExchangeMapper;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ExchangeConverter extends Converter<ExchangeConfig, Exchange> {
 
     @Override

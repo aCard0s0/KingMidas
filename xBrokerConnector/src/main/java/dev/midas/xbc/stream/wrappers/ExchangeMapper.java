@@ -13,19 +13,19 @@ public enum ExchangeMapper {
     BITSTAMP("BITSTAMP", BitstampStreamingExchange.class);
 
     private final String exchangeId;
-    private final Class<StreamingExchange> xStreamingExchange;
+    private final Class<?> xStreamingExchange;
 
     private static final Map<String, ExchangeMapper> BY_ID = new HashMap<>();
-    private static final Map<Class, ExchangeMapper> BY_CLASS = new HashMap<>();
+    private static final Map<Class<?>, ExchangeMapper> BY_CLASS = new HashMap<>();
 
     static {
-        for(ExchangeMapper exchanges : values()) {
+        for (ExchangeMapper exchanges : values()) {
             BY_ID.put(exchanges.exchangeId, exchanges);
             BY_CLASS.put(exchanges.xStreamingExchange, exchanges);
         }
     }
 
-    ExchangeMapper(String exchangeId, Class xStreamingExchange) {
+    ExchangeMapper(String exchangeId, Class<?> xStreamingExchange) {
         this.exchangeId = exchangeId;
         this.xStreamingExchange = xStreamingExchange;
     }
@@ -35,14 +35,14 @@ public enum ExchangeMapper {
     }
 
     public Class<StreamingExchange> getxStreamingExchange() {
-        return xStreamingExchange;
+        return (Class<StreamingExchange>) xStreamingExchange;
     }
 
     public static ExchangeMapper valueOfId(String id) {
         return BY_ID.get(id);
     }
 
-    public static ExchangeMapper valueOfClass(Class xclass) {
+    public static ExchangeMapper valueOfClass(Class<?> xclass) {
         return BY_CLASS.get(xclass);
     }
 }

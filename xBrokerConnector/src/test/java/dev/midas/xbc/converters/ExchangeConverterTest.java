@@ -21,7 +21,7 @@ public class ExchangeConverterTest {
     public void mustSucceedConvertingExchangeConfig() {
         ExchangeConfig testConfig = new ExchangeConfig.Builder()
                 .setExchangeId("KRAKEN")
-                .setName("Test name")
+                .setName("TradeObserver name")
                 .build();
 
         Exchange exchange = this.victim.convert(testConfig);

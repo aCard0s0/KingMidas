@@ -6,14 +6,16 @@ import info.bitrich.xchangestream.core.StreamingExchange;
 import info.bitrich.xchangestream.core.StreamingExchangeFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.NotFoundException;
 import java.util.HashMap;
 import java.util.Optional;
 
 /**
- *  READY FOR TEST!!
+ *  This manager ensures that only exist one connection to one Exchange House.
  */
+@Component
 public class ExchangeManager extends HashMap<Exchange, StreamingExchange> {
 
     private static final Logger LOG = LogManager.getLogger(StreamManager.class.getName());
@@ -42,15 +44,6 @@ public class ExchangeManager extends HashMap<Exchange, StreamingExchange> {
 
         StreamingExchange removed = this.remove(exchange);
         disconnect(removed);
-        LOG.debug(String.format("Exchange %s disconnected", exchange.getExchangeMap().getExchangeId()));
-        return removed;
-    }
-
-    public StreamingExchange disconnectExchange(ExchangeMapper enumId) {
-        Exchange exchange = findExchangeByEnumId(enumId);
-        StreamingExchange removed = this.remove(exchange);
-        disconnect(removed);
-
         LOG.debug(String.format("Exchange %s disconnected", exchange.getExchangeMap().getExchangeId()));
         return removed;
     }
@@ -87,7 +80,7 @@ public class ExchangeManager extends HashMap<Exchange, StreamingExchange> {
     }
 
     public StreamingExchange get(ExchangeMapper enumId) {
-        return this.get(this.findExchangeByEnumId(enumId));
+        return this.get( this.findExchangeByEnumId(enumId) );
     }
 
     private static void disconnect(StreamingExchange broker) {
