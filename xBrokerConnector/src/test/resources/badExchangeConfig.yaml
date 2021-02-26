@@ -1,0 +1,15 @@
+- exchangeId: kraken
+  name: TradeObserver Kraken Exchange
+  markets:
+    - marketId: BTCEUR
+      name: BTC/EUR
+      listeningTrades: true
+      listeningOrderBook: false
+
+- exchangeId: bitstamp
+  name: TradeObserver Bitstamp Exchange
+  markets:
+    - marketId: ETHEUR
+      name: ETH/USD
+      listeningTrades: true
+      listeningOrderBook: false

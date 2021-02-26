@@ -1,0 +1,7 @@
+- exchangeId: kraken
+  name: TradeObserver Kraken1 Exchange
+  markets:
+    - pair: BTCEUR
+      listeningTrades: true
+      listeningTicker: false
+      listeningOrderBook: false
