@@ -1,0 +1,5 @@
+- exchangeId: bitstamp
+  pairs:
+    - pair: BTCEUR
+      beginning: 1325289600
+      steps: [3d]
