@@ -1,47 +1,24 @@
 package dev.midas.dss.config.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import org.knowm.xchange.currency.CurrencyPair;
 
-public class PairConfig {
-
-    public static class Builder {
-        private String pair;
-        private long beginning;
-        private String[] steps;
-
-        public Builder() { }
-
-        public Builder setPair(String pair) {
-            this.pair = pair;
-            return this;
-        }
-
-        public Builder setBeginning(long beginning) {
-            this.beginning = beginning;
-            return this;
-        }
-
-        public Builder setSteps(String[] steps) {
-            this.steps = steps;
-            return this;
-        }
-
-        public PairConfig build() {
-            PairConfig config = new PairConfig();
-            config.pair = this.pair;
-            config.beginning = this.beginning;
-            config.steps = this.steps;
-            return config;
-        }
-    }
+public class CandlesConfig {
 
     private String pair;
     private long beginning;
     private String[] steps;
 
-    public PairConfig() {}
+    public CandlesConfig() {}
+
+    @JsonCreator
+    public CandlesConfig(String pair) {
+        this.pair = pair;
+    }
 
     public String getPair() {
         return pair;
@@ -76,7 +53,7 @@ public class PairConfig {
             return false;
         }
 
-        PairConfig that = (PairConfig) o;
+        CandlesConfig that = (CandlesConfig) o;
 
         return Objects.equal(pair, that.pair) &&
                 Objects.equal(beginning, that.beginning) &&

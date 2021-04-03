@@ -2,7 +2,7 @@ package dev.midas.dss.mongo;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.*;
-import dev.midas.dss.config.domain.PairConfig;
+import dev.midas.dss.config.domain.CandlesConfig;
 import dev.midas.dss.config.domain.StorageConfig;
 import dev.midas.dss.mongo.domain.Candle;
 import org.knowm.xchange.Exchange;
@@ -32,16 +32,16 @@ public class MongoManager {
     }
 
     public void updateDB(StorageConfig config) {
-        for (PairConfig pair: config.getPairs()) {
+        for (CandlesConfig pair: config.getPairs()) {
             for (String step: pair.getSteps()) {
 
-                //String collection = config.getExchangeId()+"_"+pair.getPair().toLowerCase()+"_"+step;
-
+                String collection = config.getExchangeId()+"_"+pair.getPair().toLowerCase()+"_"+step;
+                System.out.println(collection);
             }
         }
-        String collection = "candle";
-        this.createCollectionIfNotExists(collection);
-        this.updateCollection(collection, 60);
+        //String collection = "candle";
+        //this.createCollectionIfNotExists(collection);
+        //this.updateCollection(collection, 60);
     }
 
     private void createCollectionIfNotExists(String collName) {

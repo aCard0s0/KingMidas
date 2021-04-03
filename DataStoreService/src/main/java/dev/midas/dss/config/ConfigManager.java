@@ -1,12 +1,16 @@
 package dev.midas.dss.config;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.util.EnumResolver;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import dev.midas.dss.config.domain.StorageConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.knowm.xchange.currency.CurrencyPair;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +41,17 @@ public class ConfigManager {
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
+        /*mapper.addHandler(new DeserializationProblemHandler() {
+            @Override
+            public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser p, JsonDeserializer<?> deserializer, Object beanOrClass, String propertyName) throws IOException {
+                System.out.println("enum");
+                return false;
+            }
+        });*/
+        //mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
+        //mapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
+        //mapper.configure(DeserializationFeature.READ_ENUMS_USING_TO_STRING, true);
+
 
         File file = new File(path);
         List<StorageConfig> configs = Collections.emptyList();

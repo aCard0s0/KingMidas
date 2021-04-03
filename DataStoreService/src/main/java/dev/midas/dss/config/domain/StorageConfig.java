@@ -9,7 +9,7 @@ public class StorageConfig {
 
     public static class Builder {
         private String exchangeId;
-        private List<PairConfig> pairs;
+        private List<CandlesConfig> pairs;
 
         public Builder() {
         }
@@ -19,7 +19,7 @@ public class StorageConfig {
             return this;
         }
 
-        public Builder setMarkets(List<PairConfig> pairs) {
+        public Builder setMarkets(List<CandlesConfig> pairs) {
             this.pairs = pairs;
             return this;
         }
@@ -33,7 +33,7 @@ public class StorageConfig {
     }
 
     private String exchangeId;
-    private List<PairConfig> pairs;
+    private List<CandlesConfig> pairs;
 
     private StorageConfig() {
     }
@@ -46,11 +46,11 @@ public class StorageConfig {
         this.exchangeId = exchangeId;
     }
 
-    public List<PairConfig> getPairs() {
+    public List<CandlesConfig> getPairs() {
         return pairs;
     }
 
-    public void setPairs(List<PairConfig> pairs) {
+    public void setPairs(List<CandlesConfig> pairs) {
         this.pairs = pairs;
     }
 
