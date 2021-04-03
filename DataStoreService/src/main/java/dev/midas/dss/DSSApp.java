@@ -1,23 +1,23 @@
-package dev.midas.xbc;
+package dev.midas.dss;
 
-import dev.midas.xbc.stream.ListeningEngine;
+import dev.midas.dss.core.StoreEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class XBCApp implements CommandLineRunner {
+public class DSSApp implements CommandLineRunner {
 
     @Autowired
-    private ListeningEngine listening;
+    private StoreEngine engine;
 
     public static void main(String[] args) {
-        SpringApplication.run(XBCApp.class, args);
+        SpringApplication.run(DSSApp.class, args);
     }
 
     @Override
     public void run(String... args) {
-        listening.startDefaultConfigs();
+        engine.startDefaultConfigs();
     }
 }

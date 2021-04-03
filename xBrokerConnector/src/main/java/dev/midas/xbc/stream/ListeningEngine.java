@@ -44,13 +44,13 @@ public class ListeningEngine {
         this.streams = streams;
     }
 
-    public void startDefaultListeners() {
+    public void startDefaultConfigs() {
         List<ExchangeConfig> localConfig = configurator.loadDefaultExchangeConfig();
 
         for (ExchangeConfig exchangeConfig : localConfig) {
             startListener(exchangeConfig);
         }
-        LOG.info(() -> "Default configuration started.");
+        LOG.info(() -> "Default configuration loaded.");
     }
 
     public void startListener(ExchangeConfig config) {
